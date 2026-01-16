@@ -1,109 +1,67 @@
-import os
+import streamlit as st
+from datetime import date
 
-"""
-Simple Water Intake Tracker
-Tracks daily water intake and logs it to a file.
-"""
-
-from datetime import date, timedelta
-
-DAILY_GOAL_OZ = 64 # Daily water intake goal in ounces
-
-# Clear the console screen
-def clearscreen():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-def header(title):
-    width = 30
-    print()
-    print('=' * width)
-    print(title.center(width))
-    print('=' * width)
-    print()
-
-# Log the amount of water drank today
-def log_water(): 
-    print()
-    header('Log Water Intake')
-    water_drank = input('How many ounces of water have you drank today? ')
-
-    try:
-        number = int(water_drank)
-    except ValueError:
-        print('Please enter a valid number.')
-        log_water()
-
-    confirm = input(f'\nYou are about to log {number} ounces of water today. Confirm? (y/n) ').strip().lower()
-    if confirm == 'y':
-        with open('water_log.txt', 'a') as file:
-            file.write(f'{date.today()}: {number} ounces\n')
-            print()
-    elif confirm == 'n':
-        print('Log cancelled.\n')
-    else: 
-        print('\nInvalid input, please try again.\n')
-        log_water()
+LOG_FILE = 'water_log.txt'
 
 
-# Calculate and display today's total water intake
-def daily_total(): 
-    header('Daily Total')
-    todays_total = 0
+# --- Title of program ---
+st.title('Water Goal Tracker 💧')
 
-    with open('water_log.txt', 'r') as file:
-        for each_line in file:
-            if each_line.startswith(str(date.today())):
-                todays_total = todays_total + int(each_line.split(None)[1].strip())
+if 'flash_msg' not in st.session_state:
+    st.session_state.flash_msg = ''
+if 'flash_type' not in st.session_state:
+    st.session_state.flash_type = ''
 
-    print(f'\nYou have drank {todays_total} ounces of water today.')
-
-    if todays_total < DAILY_GOAL_OZ:
-        print(f'You need to drink {DAILY_GOAL_OZ - todays_total} more ounces to reach your daily goal of {DAILY_GOAL_OZ} ounces.\n')
+# --- Flashing Confirm or Cancel options ---
+if st.session_state.flash_msg:
+    if st.session_state.flash_type == "success":
+        st.success(st.session_state.flash_msg)
+    elif st.session_state.flash_type == "info":
+        st.info(st.session_state.flash_msg)
     else:
-        print('Congratulations! You have reached your daily water intake goal!\n')
+        st.warning(st.session_state.flash_msg)
 
-def weekly_totals():
-    header('Weekly Totals')
-    today = date.today()
-    weekly_total = 0
-  
-    last_7_days = []
-    for i in range(7):
-        day = today - timedelta(days = i)
-        last_7_days.append(day.isoformat())
-        for each_line in open('water_log.txt', 'r'):
-            if each_line.startswith(day.isoformat()):
-                ounces = int(each_line.split(None)[1].strip())
-                weekly_total += ounces
+    # optional: clear it so it only shows once
+    st.session_state.flash_msg = ''
+    st.session_state.flash_type = ''
 
-    print(f'\nWeekly Total: {weekly_total}')
-    print(f'Weekly Average: {weekly_total / 7:.2f} ounces\n')
+# --- init session state ---
+if 'pending_confirm' not in st.session_state:
+    st.session_state.pending_confirm = False
+if 'pending_oz' not in st.session_state:
+    st.session_state.pending_oz = 0
 
+# --- asking user for input ---
+oz = st.number_input('How many ounces of water have you drank today?', min_value=0, step=1)
 
-# Main menu for user interaction
-def main():
-    clearscreen()
-    print()
-    while True:
-        header('Water Goal Tracker')
-        print('1. Log Water Intake')
-        print('2. View Daily Total')
-        print('3. View Weekly Totals')
-        print('4. Exit\n')
+if st.button('Log Water Intake'):
+    st.session_state.pending_confirm = True
+    st.session_state.pending_oz = int(oz)
 
-        choice = input('Choose an option (1-4): ').strip()
-        if choice == '1':
-            log_water()
-        elif choice == '2':
-            daily_total()
-        elif choice == '3':
-            weekly_totals()
-        elif choice == '4':
-            print('\nGoodbye! Stay hydrated!\n')
-            break
-        else:
-            print('Invalid choice. Please select 1, 2, 3, or 4.')
+if st.session_state.pending_confirm:
+    st.warning(f"Confirm logging **{st.session_state.pending_oz} oz** for **{date.today().isoformat()}**?")
 
+    col1, col2 = st.columns(2)
 
-if __name__ == '__main__':
-    main()
+    with col1:
+        if st.button('Confirm'):
+            with open(LOG_FILE, 'a') as file:
+                file.write(f'{date.today()}: {st.session_state.pending_oz} ounces\n')
+            
+            st.session_state.flash_msg = f'Logged {st.session_state.pending_oz} ounces of water for {date.today().isoformat()}'
+            st.session_state.flash_type = 'success'
+            
+            st.session_state.pending_confirm = False
+            st.session_state.pending_oz = 0
+            st.rerun()
+    
+    with col2:
+        if st.button('Cancel'):
+            st.session_state.flash_msg = 'Log cancelled.'
+            st.session_state.flash_type = 'info'
+
+            st.session_state.pending_confirm = False
+            st.session_state.pending_oz = 0
+            st.rerun()
+
+      
