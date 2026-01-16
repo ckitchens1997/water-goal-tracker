@@ -1,6 +1,12 @@
+"""
+Simple Water Intake Tracker
+Tracks daily water intake and logs it to a file.
+"""
+
 from datetime import date
 
-def log_water():
+# Log the amount of water drank today
+def log_water(): 
     water_drank = input('How many ounces of water have you drank today? ')
 
     try:
@@ -12,7 +18,8 @@ def log_water():
     with open('water_log.txt', 'a') as file:
         file.write(f'{date.today()}: {number} ounces\n')
 
-def daily_total():
+# Calculate and display today's total water intake
+def daily_total(): 
     todays_total = 0
 
     with open('water_log.txt', 'r') as file:
@@ -22,7 +29,8 @@ def daily_total():
 
     print(f'You have drank {todays_total} ounces of water today.\n')
 
-def main():
+# Main menu for user interaction
+def main(): 
     print('Water Goal Tracker\n------------------\n1. Log Water Drank\n2. View Daily Total\n3. Quit')
     choice = input('Choose an option (1-3):')
 
