@@ -3,7 +3,7 @@ Simple Water Intake Tracker
 Tracks daily water intake and logs it to a file.
 """
 
-from datetime import date
+from datetime import date, timedelta
 
 DAILY_GOAL_OZ = 64 # Daily water intake goal in ounces
 
@@ -44,22 +44,40 @@ def daily_total():
     else:
         print('Congratulations! You have reached your daily water intake goal!\n')
 
+def weekly_totals():
+    today = date.today()
+    weekly_total = 0
+  
+    last_7_days = []
+    for i in range(7):
+        day = today - timedelta(days = i)
+        last_7_days.append(day.isoformat())
+        for each_line in open('water_log.txt', 'r'):
+            if each_line.startswith(day.isoformat()):
+                ounces = int(each_line.split(None)[1].strip())
+                weekly_total += ounces
+
+    print(f'\nWeekly Total: {weekly_total}')
+    print(f'Weekly Average: {weekly_total / 7:.2f} ounces')
+
 
 # Main menu for user interaction
 def main(): 
-    print('Water Goal Tracker\n------------------\n1. Log Water Drank\n2. View Daily Total\n3. Quit')
+    print('Water Goal Tracker\n------------------\n1. Log Water Drank\n2. View Daily Total\n3. View Weekly Totals\n4. Quit')
 
     while True:
-        choice = input('Choose an option (1-3):').strip()
+        choice = input('Choose an option (1-4): ').strip()
         if choice == '1':
             log_water()
         elif choice == '2':
             daily_total()
         elif choice == '3':
+            weekly_totals()
+        elif choice == '4':
             print('Goodbye! Stay hydrated!')
             break
         else:
-            print('Invalid choice. Please select 1, 2, or 3.')
+            print('Invalid choice. Please select 1, 2, 3, or 4.')
 
 
 if __name__ == '__main__':
