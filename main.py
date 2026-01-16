@@ -48,20 +48,19 @@ def daily_total():
 # Main menu for user interaction
 def main(): 
     print('Water Goal Tracker\n------------------\n1. Log Water Drank\n2. View Daily Total\n3. Quit')
-    choice = input('Choose an option (1-3): ')
 
-    if choice == '1':
-        log_water()
-        main()
-    elif choice == '2':
-        daily_total()
-        main()
-    elif choice == '3':
-        print('\nGoodbye! Stay hydrated!')
-        quit()
-    else:
-        print('\nInvalid option, please choose again.\n')
-        main()
+    while True:
+        choice = input('Choose an option (1-3):').strip()
+        if choice == '1':
+            log_water()
+        elif choice == '2':
+            daily_total()
+        elif choice == '3':
+            print('Goodbye! Stay hydrated!')
+            break
+        else:
+            print('Invalid choice. Please select 1, 2, or 3.')
+
 
 if __name__ == '__main__':
     main()
