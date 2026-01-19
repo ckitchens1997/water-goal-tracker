@@ -1,0 +1,116 @@
+STREAMLIT CHEAT SHEET (quick reference)
+======================================
+
+BASICS / TEXT
+-------------
+st.title("...")
+st.header("...")
+st.subheader("...")
+st.caption("...")
+st.write(x)                  # prints almost anything
+st.markdown("**bold**")      # markdown (can also do HTML w/ unsafe_allow_html=True)
+
+LAYOUT
+------
+st.tabs(["Log","Today","Weekly"])     -> returns tab containers
+with tab1: ...                        # put UI inside a tab
+st.columns(2)                         -> side-by-side layout
+col1, col2 = st.columns([2, 1])       # custom widths
+with col1: ...
+st.container()                        # group elements
+st.expander("Title")                  # collapsible section
+st.sidebar.title("...")               # sidebar area
+st.sidebar.<widget>(...)              # widgets in sidebar
+st.divider()                          # horizontal divider
+
+STATUS / FEEDBACK
+-----------------
+st.success("...")
+st.info("...")
+st.warning("...")
+st.error("...")
+with st.spinner("Loading..."): ...
+st.progress(value_0_to_1)             # progress bar
+st.metric(label="...", value="...", delta="...")   # KPI-like display
+st.toast("message", duration=5)       # temporary toast message (seconds/"short"/"long"/"infinite")
+
+INPUT WIDGETS (COMMON)
+----------------------
+clicked = st.button("Label")
+checked = st.checkbox("Label")
+choice  = st.radio("Label", options)
+sel     = st.selectbox("Label", options)
+multi   = st.multiselect("Label", options)
+val     = st.slider("Label", min_value=0, max_value=100, value=50)
+num     = st.number_input("Label", min_value=0, step=1)
+text    = st.text_input("Label")
+text2   = st.text_area("Label")
+d       = st.date_input("Label")
+t       = st.time_input("Label")
+up      = st.file_uploader("Upload a file")
+
+TIP: Most widgets support key="unique_name" to store values in st.session_state.
+
+FORMS (submit all at once)
+--------------------------
+with st.form("my_form"):
+    oz = st.number_input("Ounces", min_value=0, step=1)
+    submitted = st.form_submit_button("Submit")
+if submitted:
+    st.success(f"Logged {oz}")
+
+DATA DISPLAY
+------------
+st.dataframe(df)             # interactive table
+st.table(df)                 # static table
+st.json(obj)                 # pretty JSON view
+st.code(code_string, language="python")
+
+CHARTS / VISUALS
+----------------
+st.line_chart(data)
+st.bar_chart(data)
+st.area_chart(data)
+st.pyplot(fig)               # matplotlib figure
+st.map(df)                   # lat/lon data
+
+MEDIA
+-----
+st.image(...)
+st.audio(...)
+st.video(...)
+
+SESSION STATE + RERUNS (IMPORTANT)
+---------------------------------
+# init
+if "key" not in st.session_state:
+    st.session_state["key"] = default
+
+# read/write
+st.session_state["key"] = value
+value = st.session_state["key"]
+
+st.rerun()                   # force immediate rerun
+st.stop()                    # stop running the script now
+
+PLACEHOLDERS
+------------
+slot = st.empty()            # later you can replace/clear
+slot.write("hello")
+slot.empty()
+
+CACHING (performance)
+---------------------
+@st.cache_data
+def load_data():
+    ...
+
+@st.cache_resource
+def get_resource():
+    ...
+
+RUNNING
+-------
+streamlit run main.py
+# or:
+python -m streamlit run main.py
