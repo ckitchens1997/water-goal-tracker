@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import date
-from water_data import LOG_FILE
+from water_data import LOG_FILE, check_streak
 
 def render():
     """Render the Log Water Intake tab"""
@@ -65,3 +65,7 @@ def render():
                 st.session_state.pending_confirm = False
                 st.session_state.pending_oz = 0
                 st.rerun()
+
+    st.divider()
+    streak = check_streak()
+    st.metric("Current Streak (days) 🔥", streak)

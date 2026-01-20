@@ -51,3 +51,31 @@ def get_todays_logs(entries, today_str=None):
 def get_todays_total(entries, today_str=None):
     todays = get_todays_logs(entries, today_str)
     return sum(e["ounces"] for e in todays)
+
+def get_past_week_data():
+    entries = read_log_entries()
+    past_week_data = []
+    for i in range(7):
+        day = (date.today() - timedelta(days=i)).isoformat()
+        day_total = sum(e["ounces"] for e in entries if e["date"] == day)
+        past_week_data.append(day_total)
+    return past_week_data[::-1]
+
+def check_streak(today=None, goal_oz=DAILY_GOAL_OZ):
+    if today is None:
+        today = date.today()
+
+    entries = read_log_entries()
+
+    totals_by_date = {}
+    for entry in entries:
+        totals_by_date[entry["date"]] = totals_by_date.get(entry["date"], 0) + entry["ounces"]
+
+    streak = 0
+    cursor = today
+    while totals_by_date.get(cursor.isoformat(), 0) >= goal_oz:
+        streak += 1
+        cursor -= timedelta(days=1)
+
+    return streak
+        

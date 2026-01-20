@@ -24,7 +24,13 @@ def render():
 
     with col2:
         st.write(f'Total Ounces Remaining: {remaining}/{DAILY_GOAL_OZ} oz\n')
-        st.write(f'Logs for Today:\n\n{todays_logs}')
+        try:
+            st.write(f'Logs for {todays_logs[0]["date"]}:')
+        except IndexError:
+            st.write("No logs for today.")
+        
+        for log in todays_logs:
+            st.write(f'\n{log["ounces"]} ounces')
 
     st.divider()
 
